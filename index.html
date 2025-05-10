@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        h1{
+            text-align: center;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+        #gameCanvas {
+            border: 10px solid black;
+            display: block;
+            margin: auto;
+
+        }
+    </style>
+    <title>
+        Pong Game
+    </title>
+</head>
+<body>
+    <h1 >Pong Game</h1>
+    <canvas id="gameCanvas"
+    width="1200" height="600"></canvas>
+<script>
+   //gives java game canvas
+    let gameCanvas = document.getElementById("gameCanvas");
+    let context = gameCanvas.getContext("2d");
+
+    let player1Score = 0;
+    let player2Score = 0;
+
+    //paddle size
+    let paddleWidth = 10;
+    let paddleHeight = 75;
+
+    //paddle move speed
+    let paddleMoveSpeed = 20;
+    
+    //paddle1 postioning
+    let paddle1Y = 100;
+    let paddle1X = 50;
+
+    //paddle 2 postioning
+    let paddle2Y = 100;
+    let paddle2X = 1100;
+
+    //ball variables
+    let ballSize = 10;
+    let ballx = 300;
+    let bally = 135;
+    let ballSpeedX = 4;
+    let ballSpeedY = 3;
+    let bounceMulti = 1.2;
+
+
+   //draws paddle1
+    context.fillRect(paddle1X, paddle1Y, paddleWidth, paddleHeight);
+    //draws paddle2
+    context.fillRect(paddle2X, paddle2Y, paddleWidth, paddleHeight);
+    //draws ball
+    context.fillRect(ballx, bally, ballSize, ballSize);
+
+    //listens for keypress
+    document.addEventListener("keydown", function(event){console.log(event.key);
+
+    //moves paddle acording to keypress (w is up s is down)
+    if(event.key === "w"){paddle1Y = paddle1Y - paddleMoveSpeed;} 
+    else if(event.key === "s"){paddle1Y = paddle1Y + paddleMoveSpeed};
+    });
+
+    //ball animation
+    function drawBall(){
+     //moves the ball according to speed value
+    ballx += ballSpeedX; 
+    bally += ballSpeedY;
+    //bounces balls off the edges of the canvas
+    if (ballx >= gameCanvas.width){player1Score++; resetBall(); };
+    if (ballx <= 0) {player2Score++; resetBall();};
+    if (bally >= gameCanvas.height){ballSpeedY = -ballSpeedY};
+    if (bally <= 0){ballSpeedY = -ballSpeedY};
+    };
+
+    function resetBall(){
+    ballx = gameCanvas.width / 2;
+    bally = gameCanvas.height / 2;
+    ballSpeedX = 4;
+    ballSpeedY = 3;
+    ballSpeedX = -ballSpeedX;
+    }
+
+    function paddle1Bounce(){
+    if (
+        ballx <= paddle1X + paddleWidth &&
+        ballx >= paddle1X &&
+        bally + ballSize >= paddle1Y &&
+        bally <= paddle1Y + paddleHeight
+    ){ballSpeedX = -ballSpeedX + bounceMulti};
+    };
+
+    function paddle2Bounce(){
+    if(
+        ballx + ballSize >= paddle2X &&
+        ballx <= paddle2X + paddleWidth &&
+        bally + ballSize >= paddle2Y &&
+        bally <= paddle2Y + paddleHeight
+    ){ballSpeedX = -ballSpeedX - bounceMulti};
+    };
+
+    function paddle2Move(){
+        paddle2Y += (bally - (paddle2Y + paddleHeight/4)) * 0.1;
+    };
+
+    function drawEverything(){
+
+    //clears the canvas
+    context.clearRect(0, 0, gameCanvas.width, gameCanvas.height); 
+    
+    //draws the scores
+    context.fillStyle = "black";
+    context.font = "40px Arial";
+    context.fillText(player1Score, 300, 50);
+    context.fillText(player2Score, 900, 50);
+
+    //draws ball and paddle everyframe
+    context.fillRect(paddle1X, paddle1Y, paddleWidth, paddleHeight); 
+    context.fillRect(paddle2X, paddle2Y, paddleWidth, paddleHeight);
+    context.fillRect(ballx, bally, ballSize, ballSize);
+    };
+
+    function gameLoop(){
+    paddle2Move();
+    paddle2Bounce();
+    paddle1Bounce();
+    drawBall();
+    drawEverything();
+    requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+</script>
+    
+</body>
+</html>
